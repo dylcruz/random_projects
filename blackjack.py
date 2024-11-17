@@ -225,6 +225,7 @@ def push(player, dealer):
 
 # Set up the player's chips
 player_chips = Chips()  # Default total of 100 chips
+rebet = False
 
 while True:
     # Print an opening statement
@@ -244,7 +245,8 @@ while True:
     dealer_hand.add_card(deck.deal_one())
 
     # Prompt the player for their bet
-    take_bet(player_chips)
+    if not rebet:
+        take_bet(player_chips)
 
     # Show cards (but keep one dealer card hidden)
     show_some(player_hand, dealer_hand)
@@ -288,11 +290,21 @@ while True:
     print(f"\nPlayer's winnings stand at {player_chips.total}")
 
     # Ask to play again
-    new_game = input("Would you like to play another hand? Enter 'y' or 'n': ")
+    new_game = input("Would you like to play another hand ('r' for quick rebet)? Enter 'y' or 'n': ")
 
     if new_game[0].lower() == 'y':
         playing = True
+        rebet = False
         continue  # Start a new game
+    elif new_game[0].lower() == 'r':
+        playing = True
+        if player_chips.total >= player_chips.bet:
+            rebet = True
+            continue
+        else:
+            print('Sorry, you don\'t have enough chips to rebet!')
+            rebet = False
+            continue
     else:
         print("Thanks for playing!")
         break  # Exit the game
