@@ -113,6 +113,13 @@ class Chips:
         """
         self.total -= self.bet
 
+    def win_bet_blackjack(self):
+        """
+        Increase total chips by bet amount * 1.5 when the player wins with blackjack (10 or face card plus ace)
+        """
+        self.total += self.bet * 1.5
+        self.total = int(self.total)
+
 
 def take_bet(chips):
     """
@@ -221,10 +228,20 @@ def push(player, dealer):
     print("Dealer and Player tie! It's a push.")
 
 
+def player_blackjack(player, dealer, chips):
+    """
+    Handle scenario when player wins with blackjack (10 or face card plus ace)
+    """
+    print("Blackjack! Player wins!")
+    chips.win_bet_blackjack()  # Adjust the player's chips accordingly
+
+
 # Game logic starts here
 
 # Set up the player's chips
 player_chips = Chips()  # Default total of 100 chips
+
+# Initially set rebet to false
 rebet = False
 
 while True:
@@ -237,14 +254,16 @@ while True:
 
     # Deal two cards to each player
     player_hand = Hand()
-    player_hand.add_card(deck.deal_one())
-    player_hand.add_card(deck.deal_one())
+    # player_hand.add_card(deck.deal_one())
+    # player_hand.add_card(deck.deal_one())    
+    player_hand.add_card(Card('Clubs', 'Ten'))
+    player_hand.add_card(Card('Clubs', 'Ace'))
 
     dealer_hand = Hand()
     dealer_hand.add_card(deck.deal_one())
     dealer_hand.add_card(deck.deal_one())
 
-    # Prompt the player for their bet
+    # Prompt the player for their bet if they are not using the quick rebet feature
     if not rebet:
         take_bet(player_chips)
 
@@ -253,6 +272,13 @@ while True:
 
     # Set the playing control variable to True
     playing = True
+
+    # Checks to see if the player's initial hand adds up to 21. If it does, they win automatically
+    if (player_hand.value == 21 and dealer_hand.value != 21):
+        player_blackjack(player_hand, dealer_hand, player_chips)
+        show_all(player_hand, dealer_hand)
+        playing = False
+        player_win_bj = True
 
     while playing:
         # Prompt for player to hit or stand
@@ -266,8 +292,8 @@ while True:
             player_busts(player_hand, dealer_hand, player_chips)
             break
 
-    # If player hasn't busted, play dealer's hand
-    if player_hand.value <= 21:
+    # If player hasn't busted, and didn't  already win via blackjack, play dealer's hand
+    if player_hand.value <= 21 and not player_win_bj:
 
         # Dealer hits until their value is 17 or more
         while dealer_hand.value < 17:
@@ -288,6 +314,9 @@ while True:
 
     # Inform player of their chips total
     print(f"\nPlayer's winnings stand at {player_chips.total}")
+
+    # Resets blackjack win condition to false for next game
+    player_win_bj = False
 
     # Ask to play again
     new_game = input("Would you like to play another hand ('r' for quick rebet)? Enter 'y' or 'n': ")
