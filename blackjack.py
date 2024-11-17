@@ -167,7 +167,9 @@ def show_some(player, dealer):
     print("\nDealer's Hand:")
     print(" <card hidden>")          # Hide the first dealer card
     print('', dealer.cards[1])        # Show the second dealer card
+    print(f'Dealer\'s total: {dealer_hand.cards[1].value}') # Show decimal value of dealer's card
     print("\nPlayer's Hand:", *player.cards, sep='\n ')  # Show all player's cards
+    print(f'Player\'s total: {player_hand.value}')  # Show decimal value of player's hand
 
 
 def show_all(player, dealer):
