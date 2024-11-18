@@ -198,53 +198,6 @@ def show_all(player, dealer):
     print("\nPlayer's Hand:", *player.cards, sep='\n ')
     print("Player's Hand =", player.value)
 
-
-# def player_busts(player, dealer, chips):
-#     """
-#     Handle scenario when player busts.
-#     """
-#     print("Player busts!")
-#     chips.lose_bet()  # Adjust the player's chips accordingly
-
-
-# def player_wins(player, dealer, chips):
-#     """
-#     Handle scenario when player wins.
-#     """
-#     print("Player wins!")
-#     chips.win_bet()  # Adjust the player's chips accordingly
-
-
-# def dealer_busts(player, dealer, chips):
-#     """
-#     Handle scenario when dealer busts.
-#     """
-#     print("Dealer busts!")
-#     chips.win_bet()  # Adjust the player's chips accordingly
-
-
-# def dealer_wins(player, dealer, chips):
-#     """
-#     Handle scenario when dealer wins.
-#     """
-#     print("Dealer wins!")
-#     chips.lose_bet()  # Adjust the player's chips accordingly
-
-
-# def push(player, dealer):
-#     """
-#     Handle scenario when there is a tie.
-#     """
-#     print("Dealer and Player tie! It's a push.")
-
-
-# def player_blackjack(player, dealer, chips):
-#     """
-#     Handle scenario when player wins with blackjack (10 or face card plus ace)
-#     """
-#     print("Blackjack! Player wins!")
-#     chips.win_bet_blackjack()  # Adjust the player's chips accordingly
-
 def hand_outcome(outcome, chips):
     """
     Handle's various game outcomes such as a player busting or winning etc.
