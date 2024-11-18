@@ -174,9 +174,9 @@ def show_some(player, dealer):
     print("\nDealer's Hand:")
     print(" <card hidden>")          # Hide the first dealer card
     print('', dealer.cards[1])        # Show the second dealer card
-    print(f'Dealer\'s total: {dealer_hand.cards[1].value}') # Show decimal value of dealer's card
+    print(f'Dealer\'s visible total: {dealer.cards[1].value}') # Show decimal value of dealer's visible card
     print("\nPlayer's Hand:", *player.cards, sep='\n ')  # Show all player's cards
-    print(f'Player\'s total: {player_hand.value}')  # Show decimal value of player's hand
+    print(f'Player\'s total: {player.value}')  # Show decimal value of player's hand
 
 
 def show_all(player, dealer):
@@ -252,6 +252,9 @@ while True:
     deck = Deck()
     deck.shuffle()
 
+    # (Re)sets blackjack win condition to false for the upcoming hand
+    player_win_bj = False
+
     # Deal two cards to each player
     player_hand = Hand()
     player_hand.add_card(deck.deal_one())
@@ -312,9 +315,6 @@ while True:
 
     # Inform player of their chips total
     print(f"\nPlayer's winnings stand at {player_chips.total}")
-
-    # Resets blackjack win condition to false for next game
-    player_win_bj = False
 
     # Ask to play again
     new_game = input("Would you like to play another hand ('r' for quick rebet)? Enter 'y' or 'n': ")
