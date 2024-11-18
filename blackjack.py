@@ -254,10 +254,8 @@ while True:
 
     # Deal two cards to each player
     player_hand = Hand()
-    # player_hand.add_card(deck.deal_one())
-    # player_hand.add_card(deck.deal_one())    
-    player_hand.add_card(Card('Clubs', 'Ten'))
-    player_hand.add_card(Card('Clubs', 'Ace'))
+    player_hand.add_card(deck.deal_one())
+    player_hand.add_card(deck.deal_one())    
 
     dealer_hand = Hand()
     dealer_hand.add_card(deck.deal_one())
