@@ -282,10 +282,6 @@ while True:
 
     # Checks to see if the player's initial hand adds up to 21. If it does, they win automatically
     # if (player_hand.value == 21 and dealer_hand.value != 21):
-    #     player_blackjack(player_hand, dealer_hand, player_chips)
-    #     show_all(player_hand, dealer_hand)
-    #     playing = False
-    #     player_win_bj = True
     if player_hand.is_blackjack():
         if dealer_hand.is_blackjack():
             show_all(player_hand, dealer_hand)
