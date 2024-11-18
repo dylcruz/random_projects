@@ -88,6 +88,9 @@ class Hand:
         while self.value > 21 and self.aces:
             self.value -= 10
             self.aces -= 1
+    
+    def is_blackjack(self):
+        return self.value == 21 and len(self.cards) == 2
 
 
 class Chips:
@@ -121,13 +124,19 @@ class Chips:
         self.total = int(self.total)
 
 
-def take_bet(chips):
+def take_bet(chips, rebet=False):
     """
     Ask the player for their bet amount and handle exceptions.
     """
+    if rebet and chips.bet <= chips.total:
+        print(f"Rebetting the previous amount: {chips.bet} chips.")
+        return
+    elif rebet and chips.bet > chips.total:
+        print("Sorry, you don't have enough chips to rebet the previous amount.")
+
     while True:
         try:
-            chips.bet = int(input("How many chips would you like to bet? "))
+            bet = int(input("How many chips would you like to bet? "))
         except ValueError:
             # Handle the case where the input is not an integer
             print("Sorry, a bet must be an integer!")
@@ -136,6 +145,7 @@ def take_bet(chips):
                 # Check if the bet exceeds the player's total chips
                 print(f"Sorry, your bet can't exceed {chips.total}")
             else:
+                chips.bet = bet
                 break  # Exit the loop if the bet is valid
 
 
@@ -265,21 +275,31 @@ while True:
     dealer_hand.add_card(deck.deal_one())
 
     # Prompt the player for their bet if they are not using the quick rebet feature
-    if not rebet:
-        take_bet(player_chips)
+    take_bet(player_chips, rebet=rebet)
 
     # Show cards (but keep one dealer card hidden)
     show_some(player_hand, dealer_hand)
 
-    # Set the playing control variable to True
-    playing = True
-
     # Checks to see if the player's initial hand adds up to 21. If it does, they win automatically
-    if (player_hand.value == 21 and dealer_hand.value != 21):
-        player_blackjack(player_hand, dealer_hand, player_chips)
-        show_all(player_hand, dealer_hand)
-        playing = False
-        player_win_bj = True
+    # if (player_hand.value == 21 and dealer_hand.value != 21):
+    #     player_blackjack(player_hand, dealer_hand, player_chips)
+    #     show_all(player_hand, dealer_hand)
+    #     playing = False
+    #     player_win_bj = True
+    if player_hand.is_blackjack():
+        if dealer_hand.is_blackjack():
+            show_all(player_hand, dealer_hand)
+            push(player_hand, dealer_hand)
+        else:
+            show_all(player_hand, dealer_hand)
+            player_blackjack(player_hand, dealer_hand, player_chips)
+    else:
+        if dealer_hand.is_blackjack():
+            show_all(player_hand, dealer_hand)
+            dealer_wins(player_hand, dealer_hand, player_chips)
+        else:
+            playing = True
+
 
     while playing:
         # Prompt for player to hit or stand
@@ -317,21 +337,12 @@ while True:
     print(f"\nPlayer's winnings stand at {player_chips.total}")
 
     # Ask to play again
-    new_game = input("Would you like to play another hand ('r' for quick rebet)? Enter 'y' or 'n': ")
+    new_game = input("Would you like to play another hand? Enter 'y' for yes, 'r' to rebet, or 'n' to quit: ")
 
     if new_game[0].lower() == 'y':
-        playing = True
         rebet = False
-        continue  # Start a new game
     elif new_game[0].lower() == 'r':
-        playing = True
-        if player_chips.total >= player_chips.bet:
-            rebet = True
-            continue
-        else:
-            print('Sorry, you don\'t have enough chips to rebet!')
-            rebet = False
-            continue
+        rebet = True
     else:
         print("Thanks for playing!")
         break  # Exit the game
