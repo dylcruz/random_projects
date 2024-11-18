@@ -199,52 +199,73 @@ def show_all(player, dealer):
     print("Player's Hand =", player.value)
 
 
-def player_busts(player, dealer, chips):
-    """
-    Handle scenario when player busts.
-    """
-    print("Player busts!")
-    chips.lose_bet()  # Adjust the player's chips accordingly
+# def player_busts(player, dealer, chips):
+#     """
+#     Handle scenario when player busts.
+#     """
+#     print("Player busts!")
+#     chips.lose_bet()  # Adjust the player's chips accordingly
 
 
-def player_wins(player, dealer, chips):
-    """
-    Handle scenario when player wins.
-    """
-    print("Player wins!")
-    chips.win_bet()  # Adjust the player's chips accordingly
+# def player_wins(player, dealer, chips):
+#     """
+#     Handle scenario when player wins.
+#     """
+#     print("Player wins!")
+#     chips.win_bet()  # Adjust the player's chips accordingly
 
 
-def dealer_busts(player, dealer, chips):
-    """
-    Handle scenario when dealer busts.
-    """
-    print("Dealer busts!")
-    chips.win_bet()  # Adjust the player's chips accordingly
+# def dealer_busts(player, dealer, chips):
+#     """
+#     Handle scenario when dealer busts.
+#     """
+#     print("Dealer busts!")
+#     chips.win_bet()  # Adjust the player's chips accordingly
 
 
-def dealer_wins(player, dealer, chips):
-    """
-    Handle scenario when dealer wins.
-    """
-    print("Dealer wins!")
-    chips.lose_bet()  # Adjust the player's chips accordingly
+# def dealer_wins(player, dealer, chips):
+#     """
+#     Handle scenario when dealer wins.
+#     """
+#     print("Dealer wins!")
+#     chips.lose_bet()  # Adjust the player's chips accordingly
 
 
-def push(player, dealer):
-    """
-    Handle scenario when there is a tie.
-    """
-    print("Dealer and Player tie! It's a push.")
+# def push(player, dealer):
+#     """
+#     Handle scenario when there is a tie.
+#     """
+#     print("Dealer and Player tie! It's a push.")
 
 
-def player_blackjack(player, dealer, chips):
-    """
-    Handle scenario when player wins with blackjack (10 or face card plus ace)
-    """
-    print("Blackjack! Player wins!")
-    chips.win_bet_blackjack()  # Adjust the player's chips accordingly
+# def player_blackjack(player, dealer, chips):
+#     """
+#     Handle scenario when player wins with blackjack (10 or face card plus ace)
+#     """
+#     print("Blackjack! Player wins!")
+#     chips.win_bet_blackjack()  # Adjust the player's chips accordingly
 
+def hand_outcome(outcome, chips):
+    """
+    Handle's various game outcomes such as a player busting or winning etc.
+    """
+    if outcome == 'player_busts':
+        print("Player busts!")
+        chips.lose_bet()
+    elif outcome == 'dealer_busts':
+        print("Dealer busts!")
+        chips.win_bet()
+    elif outcome == 'player_wins':
+        print("Player wins!")
+        chips.win_bet()
+    elif outcome == 'dealer_wins':
+        print("Dealer wins!")
+        chips.lose_bet()
+    elif outcome == 'push':
+        print("Dealer and Player tie! It's a push.")
+    elif outcome == 'player_blackjack':
+         print("Blackjack! Player wins!")
+         chips.win_bet_blackjack()
 
 # Game logic starts here
 
@@ -285,14 +306,14 @@ while True:
     if player_hand.is_blackjack():
         if dealer_hand.is_blackjack():
             show_all(player_hand, dealer_hand)
-            push(player_hand, dealer_hand)
+            hand_outcome('push', player_chips)
         else:
             show_all(player_hand, dealer_hand)
-            player_blackjack(player_hand, dealer_hand, player_chips)
+            hand_outcome('player_blackjack', player_chips)
     else:
         if dealer_hand.is_blackjack():
             show_all(player_hand, dealer_hand)
-            dealer_wins(player_hand, dealer_hand, player_chips)
+            hand_outcome('dealer_wins', player_chips)
         else:
             playing = True
 
@@ -306,7 +327,7 @@ while True:
 
         # If player's hand exceeds 21, player busts and loop breaks
         if player_hand.value > 21:
-            player_busts(player_hand, dealer_hand, player_chips)
+            hand_outcome('player_busts', player_chips)
             break
 
     # If player hasn't busted, and didn't  already win via blackjack, play dealer's hand
@@ -321,13 +342,13 @@ while True:
 
         # Run different winning scenarios
         if dealer_hand.value > 21:
-            dealer_busts(player_hand, dealer_hand, player_chips)
+            hand_outcome('dealer_busts', player_chips)
         elif dealer_hand.value > player_hand.value:
-            dealer_wins(player_hand, dealer_hand, player_chips)
+            hand_outcome('dealer_wins', player_chips)
         elif dealer_hand.value < player_hand.value:
-            player_wins(player_hand, dealer_hand, player_chips)
+            hand_outcome('player_wins', player_chips)
         else:
-            push(player_hand, dealer_hand)
+            hand_outcome('push', player_chips)
 
     # Inform player of their chips total
     print(f"\nPlayer's winnings stand at {player_chips.total}")
