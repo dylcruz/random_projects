@@ -71,7 +71,6 @@ class Hand:
         self.cards = []      # List to store Card objects in the hand
         self.value = 0       # Total value of the hand
         self.aces = 0        # Number of aces in the hand
-        self.double_down = False # Whether the current hand has doubled down or not
 
     def add_card(self, card):
         """
@@ -108,25 +107,49 @@ class Chips:
         """
         self.total = total  # Total chips the player has
         self.bet = 0        # Current bet amount
+        self.double_down_bet = 0 # Current double down bet amount
 
     def win_bet(self):
         """
         Increase total chips by bet amount when the player wins.
         """
-        self.total += self.bet
+        total_bet = self.bet + self.double_down_bet
+        winnings = total_bet * 2
+        self.total += winnings
 
-    def lose_bet(self):
+    def push(self):
         """
-        Decrease total chips by bet amount when the player loses.
+        Players gets their original and double down bets back
         """
-        self.total -= self.bet
+        total_bet = self.bet + self.double_down_bet
+        self.total += total_bet
 
     def win_bet_blackjack(self):
         """
         Increase total chips by bet amount * 1.5 when the player wins with blackjack (10 or face card plus ace)
         """
-        self.total += self.bet * 1.5
+        self.total += self.bet + (self.bet * 1.5)
         self.total = int(self.total)
+
+    def double_down(self):
+        """
+        Checks to ensure player has enough chips to double down, then makes the bet
+        """
+        if self.bet <= self.total:
+            self.double_down_bet = self.bet
+            self.total -= self.double_down_bet
+            print(f'Double down! New bet amount is {self.bet + self.double_down_bet}.')
+            return True
+        else:
+            print(f'You don\'t have enough chips to double down.')
+            return False
+    
+    def reset_bets(self, rebet=False):
+        self.double_down_bet = 0
+        if rebet:
+            return
+        else:
+            self.bet = 0
 
 
 def take_bet(chips, rebet=False):
@@ -135,6 +158,7 @@ def take_bet(chips, rebet=False):
     """
     if rebet and chips.bet <= chips.total:
         print(f"Rebetting the previous amount: {chips.bet} chips.")
+        chips.total -= chips.bet
         return
     elif rebet and chips.bet > chips.total:
         print("Sorry, you don't have enough chips to rebet the previous amount.")
@@ -155,6 +179,7 @@ def take_bet(chips, rebet=False):
                 print(f'Sorry! Bet must be between {MIN_BET} and {MAX_BET} chips.')
             else:
                 chips.bet = bet
+                chips.total -= chips.bet
                 break  # Exit the loop if the bet is valid
 
 
@@ -181,14 +206,10 @@ def players_turn(deck, hand, chips):
             print("Player stands. Dealer is playing.")
             playing = False  # Player chooses to stand, end their turn
         elif x[0].lower() == 'd':
-            if (chips.bet * 2) <= chips.total: # Checks to make sure player has enough chips to double down
-                hand.double_down = True
-                chips.bet *= 2
-                print(f'Double down! New bet amount is {chips.bet}.')
+            if chips.double_down(): # Checks to make sure player has enough chips to double down
                 hit(deck, hand)
                 playing = False # You cannot hit anymore after doubling down
             else:
-                print("Sorry, you don't have enough chips to double down.")
                 continue     
         else:
             print("Sorry, please enter 'h', 's', or 'd'.")
@@ -223,7 +244,6 @@ def hand_outcome(outcome, chips):
     """
     if outcome == 'player_busts':
         print("Player busts!")
-        chips.lose_bet()
     elif outcome == 'dealer_busts':
         print("Dealer busts!")
         chips.win_bet()
@@ -232,8 +252,8 @@ def hand_outcome(outcome, chips):
         chips.win_bet()
     elif outcome == 'dealer_wins':
         print("Dealer wins!")
-        chips.lose_bet()
     elif outcome == 'push':
+        chips.push()
         print("Dealer and Player tie! It's a push.")
     elif outcome == 'player_blackjack':
          print("Blackjack! Player wins!")
@@ -261,12 +281,16 @@ while True:
 
     # Deal two cards to each player
     player_hand = Hand()
-    player_hand.add_card(deck.deal_one())
-    player_hand.add_card(deck.deal_one())    
+    # player_hand.add_card(deck.deal_one())
+    # player_hand.add_card(deck.deal_one())  
+    player_hand.add_card(Card('Hearts', 'Ten'))
+    player_hand.add_card(Card('Hearts', 'Ace'))    
 
     dealer_hand = Hand()
     dealer_hand.add_card(deck.deal_one())
     dealer_hand.add_card(deck.deal_one())
+    # dealer_hand.add_card(Card('Spades', 'Ten'))
+    # dealer_hand.add_card(Card('Spades', 'Seven'))
 
     # Prompt the player for their bet if they are not using the quick rebet feature
     take_bet(player_chips, rebet=rebet)
@@ -328,19 +352,15 @@ while True:
     # Inform player of their chips total
     print(f"\nPlayer's winnings stand at {player_chips.total}")
 
-    # Resets player's bet amount to the original, and clears the double down flag
-    if player_hand.double_down:
-        player_chips.bet /= 2
-        player_chips.bet = int(player_chips.bet)
-        player_hand.double_down = False
-
     # Ask to play again
     new_game = input("Would you like to play another hand? Enter 'y' for yes, 'r' to rebet, or 'n' to quit: ")
 
     if new_game[0].lower() == 'y':
         rebet = False
+        player_chips.reset_bets()
     elif new_game[0].lower() == 'r':
         rebet = True
+        player_chips.reset_bets(rebet=rebet)
     else:
         print("Thanks for playing!")
         break  # Exit the game
