@@ -67,6 +67,7 @@ class Hand:
         self.cards = []      # List to store Card objects in the hand
         self.value = 0       # Total value of the hand
         self.aces = 0        # Number of aces in the hand
+        self.double_down = False # Whether the current hand has doubled down or not
 
     def add_card(self, card):
         """
@@ -157,22 +158,32 @@ def hit(deck, hand):
     hand.adjust_for_ace()           # Adjust for aces if necessary
 
 
-def hit_or_stand(deck, hand):
+def players_turn(deck, hand, chips):
     """
-    Prompt the player to hit or stand.
+    Prompt the player to hit, stand, or double down.
     """
     global playing  # Use the global variable 'playing' to control the game flow
 
     while True:
-        x = input("Would you like to Hit or Stand? Enter 'h' or 's': ")
+        x = input("Would you like to Hit, Stand, or Double Down? Enter 'h', 's', or 'd': ")
 
         if x[0].lower() == 'h':
             hit(deck, hand)  # Player chooses to hit, so deal another card
         elif x[0].lower() == 's':
             print("Player stands. Dealer is playing.")
             playing = False  # Player chooses to stand, end their turn
+        elif x[0].lower() == 'd':
+            if (chips.bet * 2) <= chips.total: # Checks to make sure player has enough chips to double down
+                hand.double_down = True
+                chips.bet *= 2
+                print(f'Double down! New bet amount is {chips.bet}.')
+                hit(deck, hand)
+                playing = False # You cannot hit anymore after doubling down
+            else:
+                print("Sorry, you don't have enough chips to double down.")
+                continue     
         else:
-            print("Sorry, please enter 'h' or 's'.")
+            print("Sorry, please enter 'h', 's', or 'd'.")
             continue  # Invalid input, prompt again
         break  # Exit the loop after a valid input
 
@@ -236,8 +247,9 @@ while True:
     deck = Deck()
     deck.shuffle()
 
-    # (Re)sets blackjack win condition to false for the upcoming hand
-    player_win_bj = False
+    # Resetting boolean variables for the next hand
+    skip_dealer_hit = False
+    playing = False
 
     # Deal two cards to each player
     player_hand = Hand()
@@ -254,25 +266,28 @@ while True:
     # Show cards (but keep one dealer card hidden)
     show_some(player_hand, dealer_hand)
 
-    # Checks to see if the player's initial hand adds up to 21. If it does, they win automatically
+    # Checks to see if the player or dealer initial hand is 21. If so, the game is automatically over
     if player_hand.is_blackjack():
         if dealer_hand.is_blackjack():
             show_all(player_hand, dealer_hand)
             hand_outcome('push', player_chips)
+            skip_dealer_hit = True
         else:
             show_all(player_hand, dealer_hand)
             hand_outcome('player_blackjack', player_chips)
+            skip_dealer_hit = True
     else:
         if dealer_hand.is_blackjack():
             show_all(player_hand, dealer_hand)
             hand_outcome('dealer_wins', player_chips)
+            skip_dealer_hit = True
         else:
             playing = True
 
 
     while playing:
-        # Prompt for player to hit or stand
-        hit_or_stand(deck, player_hand)
+        # Prompt for player to choose what to do
+        players_turn(deck, player_hand, player_chips)
 
         # Show cards (but keep one dealer card hidden)
         show_some(player_hand, dealer_hand)
@@ -282,8 +297,8 @@ while True:
             hand_outcome('player_busts', player_chips)
             break
 
-    # If player hasn't busted, and didn't  already win via blackjack, play dealer's hand
-    if player_hand.value <= 21 and not player_win_bj:
+    # If player hasn't busted, and game hasn't ended early due to blackjack, the dealer now draws cards
+    if player_hand.value <= 21 and not skip_dealer_hit:
 
         # Dealer hits until their value is 17 or more
         while dealer_hand.value < 17:
@@ -304,6 +319,12 @@ while True:
 
     # Inform player of their chips total
     print(f"\nPlayer's winnings stand at {player_chips.total}")
+
+    # Resets player's bet amount to the original, and clears the double down flag
+    if player_hand.double_down:
+        player_chips.bet /= 2
+        player_chips.bet = int(player_chips.bet)
+        player_hand.double_down = False
 
     # Ask to play again
     new_game = input("Would you like to play another hand? Enter 'y' for yes, 'r' to rebet, or 'n' to quit: ")
