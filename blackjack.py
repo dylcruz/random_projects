@@ -137,7 +137,7 @@ def take_bet(chips, rebet=False):
 
     while True:
         try:
-            bet = int(input("How many chips would you like to bet? "))
+            bet = int(input("How many chips would you like to bet? (min: 5 / max: 50): "))
         except ValueError:
             # Handle the case where the input is not an integer
             print("Sorry, a bet must be an integer!")
@@ -145,6 +145,8 @@ def take_bet(chips, rebet=False):
             if chips.bet > chips.total:
                 # Check if the bet exceeds the player's total chips
                 print(f"Sorry, your bet can't exceed {chips.total}")
+            elif bet < 5 or bet > 50:
+                print('Sorry! Bet must be between 5 and 50 chips.')
             else:
                 chips.bet = bet
                 break  # Exit the loop if the bet is valid
