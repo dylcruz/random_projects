@@ -146,6 +146,7 @@ def take_bet(chips, rebet=False):
                 # Check if the bet exceeds the player's total chips
                 print(f"Sorry, your bet can't exceed {chips.total}")
             elif bet < 5 or bet > 50:
+                # Check if bet is within limits
                 print('Sorry! Bet must be between 5 and 50 chips.')
             else:
                 chips.bet = bet
