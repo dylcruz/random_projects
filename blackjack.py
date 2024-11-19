@@ -9,6 +9,10 @@ ranks = ('Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
 values = {'Two': 2, 'Three': 3, 'Four': 4, 'Five': 5, 'Six': 6, 'Seven': 7,
           'Eight': 8, 'Nine': 9, 'Ten': 10, 'Jack': 10, 'Queen': 10, 'King': 10, 'Ace': 11}
 
+# Setting the maximum and minimum bets
+MIN_BET = 5
+MAX_BET = 50
+
 class Card:
     """
     A class representing a single playing card.
@@ -137,17 +141,18 @@ def take_bet(chips, rebet=False):
 
     while True:
         try:
-            bet = int(input("How many chips would you like to bet? (min: 5 / max: 50): "))
+            print(f'You have {chips.total} chips available.')
+            bet = int(input(f"How many chips would you like to bet? (min: {MIN_BET} / max: {MAX_BET}): "))
         except ValueError:
             # Handle the case where the input is not an integer
             print("Sorry, a bet must be an integer!")
         else:
-            if chips.bet > chips.total:
+            if bet > chips.total:
                 # Check if the bet exceeds the player's total chips
                 print(f"Sorry, your bet can't exceed {chips.total}")
-            elif bet < 5 or bet > 50:
+            elif bet < MIN_BET or bet > MAX_BET:
                 # Check if bet is within limits
-                print('Sorry! Bet must be between 5 and 50 chips.')
+                print(f'Sorry! Bet must be between {MIN_BET} and {MAX_BET} chips.')
             else:
                 chips.bet = bet
                 break  # Exit the loop if the bet is valid
