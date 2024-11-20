@@ -1,7 +1,7 @@
 # blackjack(.)py
 - [X] Refactor Outcome Functions:
     + You can consolidate the outcome functions (player_busts, player_wins, etc.) into a single function with parameters to specify the outcome. This reduces repetition.
-- [ ] Avoid Using Global Variables:
+- [X] Avoid Using Global Variables:
     + The use of global variables like playing and skip_dealer_hit can be minimized. You can pass these as parameters or manage them within classes or the main game loop.
 - [X] Implement Betting Limits:
     + You might consider adding minimum and maximum bet limits to make the game more realistic.
@@ -10,4 +10,6 @@
 - [X] Impletment 'double down' feature
 - [ ] Encapsulate game logic in a classes
 - [ ] Insurance feature
-- [ ] Create a 'player' class to handle multiple players at the table
+- [X] Create a 'player' class
+- [ ] Multiple players
+- [ ] Splitting feature
