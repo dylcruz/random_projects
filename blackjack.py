@@ -302,16 +302,16 @@ class Game:
         if player.hand.is_blackjack():
             if dealer_hand.is_blackjack():
                 self.show_all(player.hand, dealer_hand)
-                self.hand_outcome('push', p1.chips)
+                self.hand_outcome('push', player.chips)
                 player.skip_dealer_hit = True
             else:
                 self.show_all(player.hand, dealer_hand)
-                self.hand_outcome('player_blackjack', p1.chips)
+                self.hand_outcome('player_blackjack', player.chips)
                 player.skip_dealer_hit = True
         else:
             if dealer_hand.is_blackjack():
                 self.show_all(player.hand, dealer_hand)
-                self.hand_outcome('dealer_wins', p1.chips)
+                self.hand_outcome('dealer_wins', player.chips)
                 player.skip_dealer_hit = True
             else:
                 player.playing = True
