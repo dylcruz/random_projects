@@ -240,7 +240,7 @@ class Game:
             if x[0].lower() == 'h':
                 self.hit(player.hand)  # Player chooses to hit, so deal another card
             elif x[0].lower() == 's':
-                print("Player stands. Dealer is playing.")
+                print(f"{player.name} stands. Dealer is playing.")
                 player.playing = False  # Player chooses to stand, end their turn
             elif x[0].lower() == 'd':
                 if player.chips.double_down(): # Checks to make sure player has enough chips to double down
@@ -296,6 +296,10 @@ class Game:
         elif outcome == 'player_blackjack':
             print(f"Blackjack! {player.name} wins!")
             player.chips.win_bet_blackjack()
+        
+        # Inform player of their chips total
+        print(f"\n{player.name}'s winnings stand at {p1.chips.total}")
+        
 
 
     def check_blackjack(self, player, dealer_hand):
@@ -376,9 +380,6 @@ while True:
             game.hand_outcome('player_wins', p1)
         else:
             game.hand_outcome('push', p1)
-
-    # Inform player of their chips total
-    print(f"\nPlayer's winnings stand at {p1.chips.total}")
 
     # Resets the player's hand
     p1.reset()
