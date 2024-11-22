@@ -276,42 +276,42 @@ class Game:
         print("Player's Hand =", player_hand.value)
 
 
-    def hand_outcome(self, outcome, chips):
+    def hand_outcome(self, outcome, player):
         """
         Handle's various game outcomes such as a player busting or winning etc.
         """
         if outcome == 'player_busts':
-            print("Player busts!")
+            print(f"{player.name} busts!")
         elif outcome == 'dealer_busts':
             print("Dealer busts!")
-            chips.win_bet()
+            player.chips.win_bet()
         elif outcome == 'player_wins':
-            print("Player wins!")
-            chips.win_bet()
+            print(f"{player.name} wins!")
+            player.chips.win_bet()
         elif outcome == 'dealer_wins':
             print("Dealer wins!")
         elif outcome == 'push':
-            chips.push()
-            print("Dealer and Player tie! It's a push.")
+            player.chips.push()
+            print(f"Dealer and {player.name} tie! It's a push.")
         elif outcome == 'player_blackjack':
-            print("Blackjack! Player wins!")
-            chips.win_bet_blackjack()
+            print(f"Blackjack! {player.name} wins!")
+            player.chips.win_bet_blackjack()
 
 
     def check_blackjack(self, player, dealer_hand):
         if player.hand.is_blackjack():
             if dealer_hand.is_blackjack():
                 self.show_all(player.hand, dealer_hand)
-                self.hand_outcome('push', player.chips)
+                self.hand_outcome('push', player)
                 player.skip_dealer_hit = True
             else:
                 self.show_all(player.hand, dealer_hand)
-                self.hand_outcome('player_blackjack', player.chips)
+                self.hand_outcome('player_blackjack', player)
                 player.skip_dealer_hit = True
         else:
             if dealer_hand.is_blackjack():
                 self.show_all(player.hand, dealer_hand)
-                self.hand_outcome('dealer_wins', player.chips)
+                self.hand_outcome('dealer_wins', player)
                 player.skip_dealer_hit = True
             else:
                 player.playing = True
@@ -354,7 +354,7 @@ while True:
 
         # If player's hand exceeds 21, player busts and loop breaks
         if p1.hand.value > 21:
-            game.hand_outcome('player_busts', p1.chips)
+            game.hand_outcome('player_busts', p1)
             break
 
     # If player hasn't busted, and game hasn't ended early due to blackjack, the dealer now draws cards
@@ -369,13 +369,13 @@ while True:
 
         # Run different winning scenarios
         if dealer_hand.value > 21:
-            game.hand_outcome('dealer_busts', p1.chips)
+            game.hand_outcome('dealer_busts', p1)
         elif dealer_hand.value > p1.hand.value:
-            game.hand_outcome('dealer_wins', p1.chips)
+            game.hand_outcome('dealer_wins', p1)
         elif dealer_hand.value < p1.hand.value:
-            game.hand_outcome('player_wins', p1.chips)
+            game.hand_outcome('player_wins', p1)
         else:
-            game.hand_outcome('push', p1.chips)
+            game.hand_outcome('push', p1)
 
     # Inform player of their chips total
     print(f"\nPlayer's winnings stand at {p1.chips.total}")
