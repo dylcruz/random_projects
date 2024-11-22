@@ -187,6 +187,7 @@ class Game:
 
 
     def reset_and_shuffle_deck(self):
+        print('Resetting and shuffling deck...')
         self.deck = Deck()
         self.deck.shuffle()
 
@@ -383,6 +384,10 @@ while True:
 
     # Resets the player's hand
     p1.reset()
+
+    # Reset deck if cards left less than 15
+    if len(game.deck.all_cards) < 15:
+        game.reset_and_shuffle_deck()
 
     # Ask to play again
     new_game = input("Would you like to play another hand? Enter 'y' for yes, 'r' to rebet, or 'n' to quit: ")
