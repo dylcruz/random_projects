@@ -191,60 +191,60 @@ class Game:
         self.deck.shuffle()
 
 
-    def take_bet(self, chips, rebet=False):
+    def take_bet(self, player, rebet=False):
         """
         Ask the player for their bet amount and handle exceptions.
         """
-        if rebet and chips.bet <= chips.total:
-            print(f"Rebetting the previous amount: {chips.bet} chips.")
-            chips.total -= chips.bet
+        if rebet and player.chips.bet <= player.chips.total:
+            print(f"{player.name} is rebetting the previous amount: {player.chips.bet} chips.")
+            player.chips.total -= player.chips.bet
             return
-        elif rebet and chips.bet > chips.total:
-            print("Sorry, you don't have enough chips to rebet the previous amount.")
+        elif rebet and player.chips.bet > player.chips.total:
+            print(f"Sorry {player.name}, you don't have enough chips to rebet the previous amount.")
 
         while True:
             try:
-                print(f'You have {chips.total} chips available.')
+                print(f'{player.name}, you have {player.chips.total} chips available.')
                 bet = int(input(f"How many chips would you like to bet? (min: {MIN_BET} / max: {MAX_BET}): "))
             except ValueError:
                 # Handle the case where the input is not an integer
                 print("Sorry, a bet must be an integer!")
             else:
-                if bet > chips.total:
+                if bet > player.chips.total:
                     # Check if the bet exceeds the player's total chips
-                    print(f"Sorry, your bet can't exceed {chips.total}")
+                    print(f"Sorry, your bet can't exceed {player.chips.total}")
                 elif bet < MIN_BET or bet > MAX_BET:
                     # Check if bet is within limits
                     print(f'Sorry! Bet must be between {MIN_BET} and {MAX_BET} chips.')
                 else:
-                    chips.bet = bet
-                    chips.total -= chips.bet
+                    player.chips.bet = bet
+                    player.chips.total -= player.chips.bet
                     break  # Exit the loop if the bet is valid
 
 
-    def hit(self, deck, hand):
+    def hit(self, hand):
         """
         Add a card to the hand and adjust for aces.
         """
-        hand.add_card(deck.deal_one())  # Deal a card from the deck and add it to the hand
+        hand.add_card(self.deck.deal_one())  # Deal a card from the deck and add it to the hand
         hand.adjust_for_ace()           # Adjust for aces if necessary
 
 
-    def players_turn(self, deck, player):
+    def players_turn(self, player):
         """
         Prompt the player to hit, stand, or double down.
         """
         while True:
-            x = input("Would you like to Hit, Stand, or Double Down? Enter 'h', 's', or 'd': ")
+            x = input(f"{player.name}, would you like to (h)it, (s)tand, or (d)ouble down? :  ")
 
             if x[0].lower() == 'h':
-                self.hit(deck, player.hand)  # Player chooses to hit, so deal another card
+                self.hit(player.hand)  # Player chooses to hit, so deal another card
             elif x[0].lower() == 's':
                 print("Player stands. Dealer is playing.")
                 player.playing = False  # Player chooses to stand, end their turn
             elif x[0].lower() == 'd':
                 if player.chips.double_down(): # Checks to make sure player has enough chips to double down
-                    self.hit(deck, player.hand)
+                    self.hit(self.deck, player.hand)
                     player.playing = False # You cannot hit anymore after doubling down
                 else:
                     continue     
@@ -254,7 +254,7 @@ class Game:
             break  # Exit the loop after a valid input
 
 
-    def show_some(self, player_hand, dealer_hand):
+    def show_some(self, player, dealer_hand):
         """
         Show the player's cards and one of the dealer's cards (hide the other).
         """
@@ -262,18 +262,18 @@ class Game:
         print(" <card hidden>")          # Hide the first dealer card
         print('', dealer_hand.cards[1])        # Show the second dealer card
         print(f'Dealer\'s visible total: {dealer_hand.cards[1].value}') # Show decimal value of dealer's visible card
-        print("\nPlayer's Hand:", *player_hand.cards, sep='\n ')  # Show all player's cards
-        print(f'Player\'s total: {player_hand.value}')  # Show decimal value of player's hand
+        print(f"\n{player.name}\'s Hand:", *player.hand.cards, sep='\n ')  # Show all player's cards
+        print(f'{player.name}\'s total: {player.hand.value}')  # Show decimal value of player's hand
 
 
-    def show_all(self, player_hand, dealer_hand):
+    def show_all(self, player, dealer_hand):
         """
         Show all cards of both player and dealer.
         """
         print("\nDealer's Hand:", *dealer_hand.cards, sep='\n ')
         print("Dealer's Hand =", dealer_hand.value)
-        print("\nPlayer's Hand:", *player_hand.cards, sep='\n ')
-        print("Player's Hand =", player_hand.value)
+        print(f"\n{player.name}'s Hand:", *player.hand.cards, sep='\n ')
+        print(f"{player.name}'s Hand =", player.hand.value)
 
 
     def hand_outcome(self, outcome, player):
@@ -301,16 +301,16 @@ class Game:
     def check_blackjack(self, player, dealer_hand):
         if player.hand.is_blackjack():
             if dealer_hand.is_blackjack():
-                self.show_all(player.hand, dealer_hand)
+                self.show_all(player, dealer_hand)
                 self.hand_outcome('push', player)
                 player.skip_dealer_hit = True
             else:
-                self.show_all(player.hand, dealer_hand)
+                self.show_all(player, dealer_hand)
                 self.hand_outcome('player_blackjack', player)
                 player.skip_dealer_hit = True
         else:
             if dealer_hand.is_blackjack():
-                self.show_all(player.hand, dealer_hand)
+                self.show_all(player, dealer_hand)
                 self.hand_outcome('dealer_wins', player)
                 player.skip_dealer_hit = True
             else:
@@ -337,20 +337,20 @@ while True:
     dealer_hand.add_card(game.deck.deal_one())
 
     # Prompt the player for their bet if they are not using the quick rebet feature
-    game.take_bet(p1.chips, p1.rebet)
+    game.take_bet(p1, p1.rebet)
 
     # Show cards (but keep one dealer card hidden)
-    game.show_some(p1.hand, dealer_hand)
+    game.show_some(p1, dealer_hand)
 
     # Checks to see if the player or dealer initial hand is 21. If so, the game is automatically over
     game.check_blackjack(p1, dealer_hand)
 
     while p1.playing:
         # Prompt for player to choose what to do
-        game.players_turn(game.deck, p1)
+        game.players_turn(p1)
 
         # Show cards (but keep one dealer card hidden)
-        game.show_some(p1.hand, dealer_hand)
+        game.show_some(p1, dealer_hand)
 
         # If player's hand exceeds 21, player busts and loop breaks
         if p1.hand.value > 21:
@@ -362,10 +362,10 @@ while True:
 
         # Dealer hits until their value is 17 or more
         while dealer_hand.value < 17:
-            game.hit(game.deck, dealer_hand)
+            game.hit(dealer_hand)
 
         # Show all cards
-        game.show_all(p1.hand, dealer_hand)
+        game.show_all(p1, dealer_hand)
 
         # Run different winning scenarios
         if dealer_hand.value > 21:
