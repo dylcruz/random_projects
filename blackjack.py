@@ -390,14 +390,20 @@ while True:
         game.reset_and_shuffle_deck()
 
     # Ask to play again
-    new_game = input("Would you like to play another hand? Enter 'y' for yes, 'r' to rebet, or 'n' to quit: ")
 
-    if new_game[0].lower() == 'y':
-        p1.rebet = False
-        p1.chips.reset_bets()
-    elif new_game[0].lower() == 'r':
-        p1.rebet = True
-        p1.chips.reset_bets(rebet=p1.rebet)
-    else:
-        print("Thanks for playing!")
-        break  # Exit the game
+    while True:
+        new_game = input("Would you like to play another hand? Enter 'y' for yes, 'r' to rebet, or 'n' to quit: ")
+        if new_game[0].lower() == 'y':
+            p1.rebet = False
+            p1.chips.reset_bets()
+            break
+        elif new_game[0].lower() == 'r':
+            p1.rebet = True
+            p1.chips.reset_bets(rebet=p1.rebet)
+            break
+        elif new_game[0].lower() == 'n':
+            print("Thanks for playing!")
+            quit()  # Exit the game
+        else:
+            print('Invalid option.')
+
