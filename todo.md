@@ -8,8 +8,9 @@
 - [ ] Improve User Input Handling:
     + Use input validation functions to cleanly handle user inputs throughout the code.
 - [X] Impletment 'double down' feature
-- [ ] Encapsulate game logic in a classes
+- [X] Encapsulate game logic in a classes
 - [ ] Insurance feature
 - [X] Create a 'player' class
 - [ ] Multiple players
 - [ ] Splitting feature
+- [ ] Fix double ace bug
