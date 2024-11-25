@@ -18,17 +18,13 @@ class Card:
     A class representing a single playing card.
     """
     def __init__(self, suit, rank):
-        """
-        Initialize a card with suit and rank.
-        """
+        # Initialize a card with suit and rank.
         self.suit = suit  # Suit of the card (Hearts, Diamonds, etc.)
         self.rank = rank  # Rank of the card (Two, Three, etc.)
         self.value = values[rank]  # Numerical value of the card based on Blackjack rules
 
     def __str__(self):
-        """
-        Return a string representation of the card.
-        """
+        # Return a string representation of the card.
         return f"{self.rank} of {self.suit}"
 
 
@@ -37,9 +33,7 @@ class Deck:
     A class representing a deck of 52 playing cards.
     """
     def __init__(self):
-        """
-        Initialize the deck with all 52 cards.
-        """
+        # Initialize the deck with all 52 cards.
         self.all_cards = []  # Start with an empty list to hold all Card objects
         for suit in suits:
             for rank in ranks:
@@ -48,15 +42,11 @@ class Deck:
                 self.all_cards.append(created_card)
 
     def shuffle(self):
-        """
-        Shuffle the deck.
-        """
+        # Shuffle the deck.
         random.shuffle(self.all_cards)  # Use random.shuffle to shuffle the deck
 
     def deal_one(self):
-        """
-        Deal one card from the deck.
-        """
+        # Deal one card from the deck.
         return self.all_cards.pop()  # Remove and return the last card from the deck
 
 
@@ -65,17 +55,13 @@ class Hand:
     A class representing a player's or dealer's hand.
     """
     def __init__(self):
-        """
-        Initialize an empty hand.
-        """
+        # Initialize an empty hand.
         self.cards = []      # List to store Card objects in the hand
         self.value = 0       # Total value of the hand
         self.aces = 0        # Number of aces in the hand
 
     def add_card(self, card):
-        """
-        Add a card to the hand.
-        """
+        # Add a card to the hand.
         self.cards.append(card)      # Add the card to the hand
         self.value += card.value     # Add the card's value to the hand's total value
 
@@ -84,9 +70,7 @@ class Hand:
             self.aces += 1
 
     def adjust_for_ace(self):
-        """
-        Adjust the value of the hand if there are aces and total value is over 21.
-        """
+        # Adjust the value of the hand if there are aces and total value is over 21.
         # If total value > 21 and there's an ace, reduce the total value by 10
         # (treat the ace as 1 instead of 11)
         while self.value > 21 and self.aces:
@@ -94,12 +78,11 @@ class Hand:
             self.aces -= 1
     
     def is_blackjack(self):
+        # Checks to see if a hand's value is 21 with 2 cards
         return self.value == 21 and len(self.cards) == 2
     
     def reset(self):
-        """
-        Resets hand values back to initial
-        """
+        # Resets hand values back to initial
         self.cards = []
         self.value = 0
         self.aces = 0
@@ -110,39 +93,29 @@ class Chips:
     A class to keep track of a player's chips.
     """
     def __init__(self, total=100):
-        """
-        Initialize chips with a default total of 100.
-        """
+        # Initialize chips with a default total of 100.
         self.total = total  # Total chips the player has
         self.bet = 0        # Current bet amount
         self.double_down_bet = 0 # Current double down bet amount
 
     def win_bet(self):
-        """
-        Increase total chips by bet amount when the player wins.
-        """
+        # Increase total chips by bet amount when the player wins.
         total_bet = self.bet + self.double_down_bet
         winnings = total_bet * 2
         self.total += winnings
 
     def push(self):
-        """
-        Players gets their original and double down bets back
-        """
+        # Players gets their original and double down bets back
         total_bet = self.bet + self.double_down_bet
         self.total += total_bet
 
     def win_bet_blackjack(self):
-        """
-        Increase total chips by bet amount * 1.5 when the player wins with blackjack (10 or face card plus ace)
-        """
+        # Increase total chips by bet amount * 1.5 when the player wins with blackjack (10 or face card plus ace)
         self.total += self.bet + (self.bet * 1.5)
         self.total = int(self.total)
 
     def double_down(self):
-        """
-        Checks to ensure player has enough chips to double down, then makes the bet
-        """
+        # Checks to ensure player has enough chips to double down, then makes the bet
         if self.bet <= self.total:
             self.double_down_bet = self.bet
             self.total -= self.double_down_bet
@@ -153,6 +126,7 @@ class Chips:
             return False
     
     def reset_bets(self, rebet=False):
+        # Resets player's double down bet, and regular bet if rebet is false 
         self.double_down_bet = 0
         if rebet:
             return
@@ -187,15 +161,16 @@ class Game:
 
 
     def reset_and_shuffle_deck(self):
+        # Creates a new instance of Deck and shuffles it
         print('Resetting and shuffling deck...')
         self.deck = Deck()
         self.deck.shuffle()
 
 
     def take_bet(self, player, rebet=False):
-        """
-        Ask the player for their bet amount and handle exceptions.
-        """
+        # Ask the player for their bet amount and handle exceptions.
+
+        # Checks if the player is rebetting, and if they have enough chips to do so makes the bet
         if rebet and player.chips.bet <= player.chips.total:
             print(f"{player.name} is rebetting the previous amount: {player.chips.bet} chips.")
             player.chips.total -= player.chips.bet
@@ -224,17 +199,13 @@ class Game:
 
 
     def hit(self, hand):
-        """
-        Add a card to the hand and adjust for aces.
-        """
+        # Add a card to the hand and adjust for aces.
         hand.add_card(self.deck.deal_one())  # Deal a card from the deck and add it to the hand
         hand.adjust_for_ace()           # Adjust for aces if necessary
 
 
     def players_turn(self, player):
-        """
-        Prompt the player to hit, stand, or double down.
-        """
+        # Prompt the player to hit, stand, or double down.
         while True:
             x = input(f"{player.name}, would you like to (h)it, (s)tand, or (d)ouble down? :  ")
 
@@ -256,9 +227,7 @@ class Game:
 
 
     def show_some(self, player, dealer_hand):
-        """
-        Show the player's cards and one of the dealer's cards (hide the other).
-        """
+        # Show the player's cards and one of the dealer's cards (hide the other).
         print("\nDealer's Hand:")
         print(" <card hidden>")          # Hide the first dealer card
         print('', dealer_hand.cards[1])        # Show the second dealer card
@@ -268,9 +237,7 @@ class Game:
 
 
     def show_all(self, player, dealer_hand):
-        """
-        Show all cards of both player and dealer.
-        """
+        # Show all cards of both player and dealer.
         print("\nDealer's Hand:", *dealer_hand.cards, sep='\n ')
         print("Dealer's Hand =", dealer_hand.value)
         print(f"\n{player.name}'s Hand:", *player.hand.cards, sep='\n ')
@@ -278,9 +245,7 @@ class Game:
 
 
     def hand_outcome(self, outcome, player):
-        """
-        Handle's various game outcomes such as a player busting or winning etc.
-        """
+        # Handle's various game outcomes such as a player busting or winning etc.
         if outcome == 'player_busts':
             print(f"{player.name} busts!")
         elif outcome == 'dealer_busts':
@@ -298,11 +263,11 @@ class Game:
             print(f"Blackjack! {player.name} wins!")
             player.chips.win_bet_blackjack()
         
-        # Inform player of their chips total
+        # Inform player of their chips total after the hand is complete
         print(f"\n{player.name}'s winnings stand at {p1.chips.total}")
         
 
-
+    # Checks a players and dealers hand if they have blackjack
     def check_blackjack(self, player, dealer_hand):
         if player.hand.is_blackjack():
             if dealer_hand.is_blackjack():
