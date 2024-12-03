@@ -14,3 +14,8 @@
 - [ ] Multiple players
 - [ ] Splitting feature
 - [ ] Fix double ace bug
+
+# craps(.)py
+- [ ] Come / don't come bets
+- [ ] ATS bets
+- [ ] Other bets tbd.
